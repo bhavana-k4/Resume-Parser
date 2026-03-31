@@ -1,0 +1,89 @@
+{
+  "programming_languages": [
+    "python", "javascript", "typescript", "java", "c++", "c#", "c", "go", "rust",
+    "ruby", "php", "swift", "kotlin", "scala", "r", "matlab", "perl", "shell",
+    "bash", "powershell", "dart", "lua", "haskell", "elixir", "clojure", "groovy"
+  ],
+  "web_frontend": [
+    "html", "css", "react", "angular", "vue", "svelte", "next.js", "nuxt.js",
+    "gatsby", "jquery", "bootstrap", "tailwind css", "sass", "less", "webpack",
+    "vite", "babel", "redux", "zustand", "graphql", "rest api", "websockets",
+    "pwa", "responsive design", "accessibility", "web components"
+  ],
+  "web_backend": [
+    "node.js", "express", "fastapi", "flask", "django", "spring boot", "rails",
+    "laravel", "asp.net", "nest.js", "hapi", "koa", "gin", "fiber", "actix",
+    "phoenix", "tornado", "celery", "gunicorn", "nginx", "apache"
+  ],
+  "databases": [
+    "sql", "mysql", "postgresql", "sqlite", "mongodb", "redis", "elasticsearch",
+    "cassandra", "dynamodb", "oracle", "ms sql server", "mariadb", "couchdb",
+    "neo4j", "influxdb", "firebase", "supabase", "prisma", "sqlalchemy",
+    "mongoose", "sequelize", "typeorm"
+  ],
+  "cloud_devops": [
+    "aws", "azure", "gcp", "google cloud", "docker", "kubernetes", "terraform",
+    "ansible", "jenkins", "github actions", "gitlab ci", "circleci", "travis ci",
+    "helm", "prometheus", "grafana", "elk stack", "logstash", "kibana",
+    "cloudformation", "pulumi", "vagrant", "linux", "ubuntu", "centos",
+    "s3", "ec2", "lambda", "rds", "ecs", "eks", "cloud functions", "azure devops",
+    "artifact registry", "cloud run", "bigquery", "airflow", "kafka", "rabbitmq"
+  ],
+  "data_science_ml": [
+    "machine learning", "deep learning", "neural networks", "nlp",
+    "natural language processing", "computer vision", "reinforcement learning",
+    "scikit-learn", "tensorflow", "pytorch", "keras", "xgboost", "lightgbm",
+    "pandas", "numpy", "scipy", "matplotlib", "seaborn", "plotly",
+    "jupyter", "hugging face", "transformers", "bert", "gpt", "llm",
+    "data preprocessing", "feature engineering", "model deployment",
+    "mlops", "mlflow", "wandb", "data pipeline", "etl", "data warehouse",
+    "tableau", "power bi", "looker", "dbt", "spark", "hadoop", "hive",
+    "statistical analysis", "regression", "classification", "clustering",
+    "time series", "a/b testing", "hypothesis testing", "data visualization"
+  ],
+  "mobile": [
+    "android", "ios", "react native", "flutter", "swift ui", "jetpack compose",
+    "xamarin", "ionic", "cordova", "expo", "mobile development"
+  ],
+  "security": [
+    "cybersecurity", "penetration testing", "ethical hacking", "siem",
+    "vulnerability assessment", "owasp", "ssl/tls", "oauth", "jwt",
+    "identity management", "sso", "encryption", "firewall", "ids/ips",
+    "network security", "application security", "devsecops", "sonarqube"
+  ],
+  "tools_practices": [
+    "git", "github", "gitlab", "bitbucket", "jira", "confluence", "notion",
+    "agile", "scrum", "kanban", "ci/cd", "tdd", "bdd", "code review",
+    "microservices", "monorepo", "api design", "swagger", "openapi",
+    "unit testing", "integration testing", "e2e testing", "pytest", "jest",
+    "cypress", "selenium", "postman", "linux administration", "bash scripting",
+    "design patterns", "system design", "data structures", "algorithms",
+    "object-oriented programming", "functional programming", "refactoring",
+    "pair programming", "technical documentation", "mvp"
+  ],
+  "soft_skills": [
+    "communication", "leadership", "teamwork", "problem solving",
+    "critical thinking", "time management", "project management",
+    "mentoring", "collaboration", "presentation", "stakeholder management",
+    "cross-functional", "adaptability", "ownership", "attention to detail",
+    "analytical thinking", "decision making", "conflict resolution",
+    "customer focus", "strategic thinking"
+  ],
+  "product_design": [
+    "product management", "product roadmap", "user stories", "wireframing",
+    "prototyping", "figma", "sketch", "adobe xd", "invision", "ui/ux",
+    "user research", "usability testing", "information architecture",
+    "interaction design", "design systems", "brand identity"
+  ],
+  "finance_business": [
+    "financial modeling", "excel", "vba", "power query", "valuation",
+    "accounting", "budgeting", "forecasting", "erp", "sap", "salesforce",
+    "crm", "business analysis", "requirements gathering", "process improvement",
+    "six sigma", "lean", "supply chain", "procurement"
+  ],
+  "certifications_common": [
+    "aws certified", "azure certified", "gcp certified", "cka", "ckad",
+    "pmp", "scrum master", "csm", "comptia", "cissp", "ceh", "ccna",
+    "google analytics", "hubspot", "data science certificate"
+  ]
+}

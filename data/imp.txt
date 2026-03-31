@@ -1,0 +1,112 @@
+# 1. Create and activate virtual environment (recommended)
+python -m venv venv
+source venv/bin/activate          # Windows: venv\Scripts\activate
+
+# 2. Install all dependencies
+pip install -r requirements.txt
+
+# 3. Download the spaCy English model
+python -m spacy download en_core_web_sm
+
+# 4. Set up your environment file
+cp .env.example .env
+# Open .env and paste your OpenAI API key
+
+# 5. Run the app
+python app.py
+# Visit → http://localhost:5000
+```
+
+---
+
+**Folder structure to confirm before running**
+```
+resume_parser/
+├── app.py
+├── config.py
+├── requirements.txt
+├── .env                   ← you create this from .env.example
+├── modules/
+│   ├── __init__.py
+│   ├── extractor.py
+│   ├── nlp_parser.py
+│   ├── matcher.py
+│   ├── gpt_analyzer.py
+│   ├── ats_checker.py
+│   └── job_comparator.py
+├── data/
+│   └── skills_db.json
+├── templates/
+│   ├── index.html
+│   └── results.html
+└── static/
+    ├── style.css
+    └── charts.js
+
+--------------------------------------
+pip install google-generativeai
+```
+
+Then add to your `.env`:
+```
+GEMINI_API_KEY=your-key-from-aistudio.google.com
+
+
+
+
+-----------------latest--------------------------
+# 1. Install the new official SDK (uninstall old one first)
+pip uninstall google-generativeai -y
+pip install google-genai
+
+# 2. Restart the server
+python app.py
+```
+
+The two bugs that were causing the errors — the old `google.generativeai` package is fully deprecated and throws a `FutureWarning`, and `gemini-1.5-flash` is no longer available on the free API tier. The new SDK is `google-genai` (imported as `from google import genai`) and the model is now `gemini-2.0-flash` which is the latest, fastest, and free.
+
+---
+
+## Project Summary — for your examiner
+
+**What we built:** An intelligent Resume Parser web application that takes a candidate's resume and any job description, and tells them exactly how well they match, what's missing, and how to improve.
+
+**The full data flow:**
+```
+User uploads Resume (PDF/DOCX/TXT)
+          +  pastes Job Description
+                    ↓
+         extractor.py  ← pdfplumber / python-docx
+         pulls clean text from the file
+                    ↓
+         nlp_parser.py  ← spaCy + skills_db.json
+         extracts: skills, years of experience,
+         education level, job titles
+                    ↓
+    ┌─────────────────────────────────┐
+    │         matcher.py              │
+    │  TF-IDF Vectorizer (scikit-learn│
+    │  cosine similarity score 0–100  │
+    │  + skill overlap ratio          │
+    └────────────┬────────────────────┘
+                 │
+    ┌────────────┴────────────┐  ┌──────────────────────┐
+    │     ats_checker.py      │  │   gpt_analyzer.py    │
+    │  Section detection      │  │   Gemini 2.0 Flash   │
+    │  Keyword density audit  │  │   Gap explanations   │
+    │  Formatting red flags   │  │   Action suggestions │
+    └────────────┬────────────┘  └──────────┬───────────┘
+                 └──────────┬───────────────┘
+                            ↓
+                     results.html
+          Score ring · Skill tags · ATS grid
+          Doughnut chart · AI suggestions
+
+
+    --------------latest cahnge deep learning-------------
+    Step 1 — Install new dependencies
+pip install sentence-transformers torch transformers
+pip install spacy && python -m spacy download en_core_web_sm
+
+The sentence-transformers model (all-MiniLM-L6-v2) downloads automatically
+on first run. It is ~90 MB and cached in ~/.cache/huggingface/.

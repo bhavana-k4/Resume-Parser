@@ -1,0 +1,23 @@
+# ── Web framework ──────────────────────────────────────────────────────────
+flask>=3.0.0
+werkzeug>=3.0.0
+python-dotenv>=1.0.0
+
+# ── File parsing ───────────────────────────────────────────────────────────
+pdfplumber>=0.10.0
+python-docx>=1.1.0
+
+# ── Deep Learning / NLP ────────────────────────────────────────────────────
+sentence-transformers>=2.7.0   # Transformer embeddings (all-MiniLM-L6-v2)
+torch>=2.0.0                   # PyTorch backend (CPU-only is fine)
+transformers>=4.40.0           # HuggingFace transformers
+spacy>=3.7.0                   # NER for skill extraction
+numpy>=1.26.0
+scikit-learn>=1.4.0            # cosine_similarity utility
+
+# ── AI Analysis ────────────────────────────────────────────────────────────
+google-genai>=1.0.0            # Gemini 2.0 Flash
+
+# ── Run after install ──────────────────────────────────────────────────────
+# python -m spacy download en_core_web_sm
+# The sentence-transformers model downloads automatically on first run (~90MB)

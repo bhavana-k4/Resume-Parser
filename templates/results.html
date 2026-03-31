@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Results — ResumeAI</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <div class="container">
+
+    <!-- Nav -->
+    <header class="results-header">
+      <a href="/" class="back-link">&#8592; New Analysis</a>
+      <div class="logo"><span class="logo-icon">&#9670;</span><span class="logo-text">ResumeAI</span></div>
+    </header>
+
+    <!-- ── SCORE HERO ──────────────────────────────────────────────────────── -->
+    <section class="score-hero level-{{ match.match_level | lower }}">
+
+      <!-- Score Ring -->
+      <div class="score-circle">
+        <svg viewBox="0 0 120 120" class="score-ring">
+          <circle cx="60" cy="60" r="50" class="ring-bg"/>
+          <circle cx="60" cy="60" r="50" class="ring-fill"
+                  stroke-dasharray="{{ match.overall_score * 3.14 }}, 314"
+                  stroke-dashoffset="78.5"/>
+        </svg>
+        <div class="score-number">{{ match.overall_score }}<span class="score-pct">%</span></div>
+      </div>
+
+      <!-- Score Info -->
+      <div class="score-info">
+        <div class="match-level-badge badge-{{ match.match_level | lower }}">{{ match.match_level }} Match</div>
+
+        {% if gpt.ai_status == 'ok' %}
+          <p class="score-verdict">{{ gpt.summary }}</p>
+        {% elif gpt.ai_status == 'quota_exceeded' %}
+          <p class="score-verdict ai-unavailable">Gemini free quota reached — scores below are fully accurate. Resets in a few hours.</p>
+        {% else %}
+          <p class="score-verdict ai-unavailable">AI suggestions unavailable — match score and skill analysis are accurate.</p>
+        {% endif %}
+
+        <!-- Sub scores with explanation -->
+        <div class="sub-scores">
+          <div class="sub-score" title="How similar your resume text is to the job description">
+            <span class="sub-label">Text Similarity</span>
+            <span class="sub-val">{{ (match.tfidf_score * 100) | round | int }}%</span>
+          </div>
+          <div class="sub-score" title="% of required skills found in your resume">
+            <span class="sub-label">Skill Overlap</span>
+            <span class="sub-val">{{ (match.skill_score * 100) | round | int }}%</span>
+          </div>
+          <div class="sub-score" title="How well your resume is formatted for ATS systems">
+            <span class="sub-label">ATS Format</span>
+            <span class="sub-val">{{ ats.ats_score }}%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Score explainer -->
+      <div class="score-explainer">
+        <div class="explainer-title">How is this score calculated?</div>
+        <div class="explainer-row">
+          <span class="explainer-dot" style="background:var(--purple)"></span>
+          <span><strong>Text Similarity (50%)</strong> — how closely your resume language matches the JD</span>
+        </div>
+        <div class="explainer-row">
+          <span class="explainer-dot" style="background:var(--green)"></span>
+          <span><strong>Skill Overlap (50%)</strong> — how many required skills you have vs. what the JD asks for</span>
+        </div>
+        <div class="explainer-note">
+          ATS Score is separate — it measures <em>formatting quality</em>, not content fit.
+          A high ATS score means your resume is readable by recruitment software,
+          but you still need strong skill match for a good overall score.
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ── MAIN GRID ───────────────────────────────────────────────────────── -->
+    <div class="results-grid">
+
+      <!-- ── LEFT COLUMN ──────────────────────────────────────────────────── -->
+      <div class="results-col">
+
+        <!-- Skill Gap -->
+        <div class="card">
+          <h3 class="card-title">Skill Gap Analysis</h3>
+          <div class="skill-columns">
+            <div class="skill-group">
+              <div class="skill-group-header matched-header">✓ Matched ({{ match.matched_skills | length }})</div>
+              {% if match.matched_skills %}
+                <div class="skill-tags">
+                  {% for s in match.matched_skills %}
+                    <span class="tag tag-matched">{{ s }}</span>
+                  {% endfor %}
+                </div>
+              {% else %}
+                <p class="empty-note">No direct skill matches found.</p>
+              {% endif %}
+            </div>
+            <div class="skill-group">
+              <div class="skill-group-header missing-header">✗ Missing ({{ match.missing_skills | length }})</div>
+              {% if match.missing_skills %}
+                <div class="skill-tags">
+                  {% for s in match.missing_skills %}
+                    <span class="tag tag-missing">{{ s }}</span>
+                  {% endfor %}
+                </div>
+              {% else %}
+                <p class="empty-note">No missing skills detected.</p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Score Chart -->
+        <div class="card">
+          <h3 class="card-title">Score Breakdown</h3>
+          <div class="chart-row">
+            <div class="chart-wrap"><canvas id="scoreChart"></canvas></div>
+            <div class="chart-legend">
+              <div class="legend-item">
+                <span class="legend-dot" style="background:var(--purple)"></span>
+                <div>
+                  <div class="legend-label">Text Similarity</div>
+                  <div class="legend-val">{{ (match.tfidf_score * 100) | round | int }}%</div>
+                </div>
+              </div>
+              <div class="legend-item">
+                <span class="legend-dot" style="background:var(--green)"></span>
+                <div>
+                  <div class="legend-label">Skill Match</div>
+                  <div class="legend-val">{{ (match.skill_score * 100) | round | int }}%</div>
+                </div>
+              </div>
+              <div class="legend-item">
+                <span class="legend-dot" style="background:var(--amber)"></span>
+                <div>
+                  <div class="legend-label">ATS Score</div>
+                  <div class="legend-val">{{ ats.ats_score }}%</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Resume Summary -->
+        <div class="card">
+          <h3 class="card-title">Resume Summary</h3>
+          <div class="info-rows">
+
+            <div class="info-row">
+              <span class="info-label">Total Experience</span>
+              <span class="info-val {% if resume_parsed.experience_years == 0 %}info-warn{% endif %}">
+                {% if resume_parsed.experience_years > 0 %}
+                  {{ resume_parsed.experience_years }} year{% if resume_parsed.experience_years != 1 %}s{% endif %}
+                {% else %}
+                  Not detected
+                {% endif %}
+              </span>
+            </div>
+
+            <div class="info-row">
+              <span class="info-label">Education</span>
+              <span class="info-val">
+                {% set edu_map = {
+                  'phd': "PhD / Doctorate",
+                  'masters': "Master's Degree",
+                  'bachelors': "Bachelor's Degree",
+                  'associate': "Associate Degree",
+                  'high_school': "High School / Diploma",
+                  'unknown': "Not detected"
+                } %}
+                {{ edu_map.get(resume_parsed.education, resume_parsed.education | capitalize) }}
+              </span>
+            </div>
+
+            <div class="info-row">
+              <span class="info-label">Skills Found</span>
+              <span class="info-val">
+                {{ resume_parsed.skills | length }} skill{% if resume_parsed.skills | length != 1 %}s{% endif %}
+                {% if resume_parsed.skills %}
+                  <span class="info-subtext">
+                    {{ resume_parsed.skills[:5] | join(', ') }}{% if resume_parsed.skills | length > 5 %} +{{ resume_parsed.skills | length - 5 }} more{% endif %}
+                  </span>
+                {% endif %}
+              </span>
+            </div>
+
+            <div class="info-row">
+              <span class="info-label">JD Requires</span>
+              <span class="info-val">{{ jd_parsed.required_skills | length }} skill{% if jd_parsed.required_skills | length != 1 %}s{% endif %}</span>
+            </div>
+
+            <!-- {% if resume_parsed.job_titles %}
+            <div class="info-row">
+              <span class="info-label">Roles Detected</span>
+              <span class="info-val">{{ resume_parsed.job_titles[:2] | join(' · ') }}</span>
+            </div>
+            {% endif %} -->
+
+            <div class="info-row">
+              <span class="info-label">Overall Fit</span>
+              <span class="info-val fit-val fit-{{ match.match_level | lower }}">
+                {{ match.match_level }} — {{ match.overall_score }}%
+              </span>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ── RIGHT COLUMN ─────────────────────────────────────────────────── -->
+      <div class="results-col">
+
+        <!-- ATS Report -->
+        <div class="card">
+          <h3 class="card-title">
+            ATS Compatibility
+            <span class="ats-badge ats-{{ ats.ats_level | lower | replace(' ', '-') }}">
+              {{ ats.ats_level }} · {{ ats.ats_score }}/100
+            </span>
+          </h3>
+          <div class="section-check-grid">
+            {% for section, found in ats.sections_found.items() %}
+            <div class="section-check {{ 'found' if found else 'missing' }}">
+              <span class="check-icon">{{ '\u2713' if found else '\u2717' }}</span>
+              <span class="check-label">{{ section | capitalize }}</span>
+            </div>
+            {% endfor %}
+          </div>
+          {% if ats.recommendations %}
+          <div class="ats-recs">
+            <div class="rec-header">Recommendations</div>
+            <ul class="rec-list">
+              {% for rec in ats.recommendations[:5] %}
+                <li>{{ rec }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+          {% endif %}
+          <div class="keyword-density">
+            Keyword density: <strong>{{ ats.keyword_density.density_pct }}%</strong>
+            &nbsp;·&nbsp; {{ ats.keyword_density.matched_count }} JD keywords present
+          </div>
+        </div>
+
+        <!-- AI Cards -->
+        {% if gpt.ai_status == 'ok' %}
+
+          {% if gpt.gap_analysis %}
+          <div class="card">
+            <h3 class="card-title">Gap Analysis</h3>
+            <ul class="gap-list">
+              {% for item in gpt.gap_analysis %}
+                <li class="gap-item">{{ item | replace('**', '') }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+          {% endif %}
+
+          {% if gpt.suggestions %}
+          <div class="card">
+            <h3 class="card-title">Improvement Suggestions</h3>
+            <ul class="suggestion-list">
+              {% for tip in gpt.suggestions %}
+                <li class="suggestion-item">{{ tip | replace('**', '') }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+          {% endif %}
+
+          {% if gpt.rewrite_tips %}
+          <div class="card">
+            <h3 class="card-title">Resume Rewrite Tips</h3>
+            <ul class="rewrite-list">
+              {% for tip in gpt.rewrite_tips %}
+                <li class="rewrite-item">{{ tip | replace('**', '') }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+          {% endif %}
+
+        {% elif gpt.ai_status == 'quota_exceeded' %}
+          <div class="card ai-quota-card">
+            <div class="ai-quota-icon">&#9203;</div>
+            <div class="ai-quota-title">Gemini free quota reached</div>
+            <p class="ai-quota-msg">AI gap analysis resets in a few hours. Your match score, skill gap, and ATS report are fully accurate without it.</p>
+            <div class="ai-quota-tip">Get more quota at <a href="https://aistudio.google.com" target="_blank">aistudio.google.com</a></div>
+          </div>
+        {% else %}
+          <div class="card ai-quota-card">
+            <div class="ai-quota-icon">&#9888;</div>
+            <div class="ai-quota-title">AI suggestions unavailable</div>
+            <p class="ai-quota-msg">Could not connect to Gemini AI. All scores and skill analysis are accurate.</p>
+          </div>
+        {% endif %}
+
+      </div>
+    </div>
+
+    <div class="cta-row">
+      <a href="/" class="btn-analyze">&#8592; Analyze Another Resume</a>
+    </div>
+
+  </div>
+
+  <script src="{{ url_for('static', filename='charts.js') }}"></script>
+  <script>
+    const scoreData = {{ chart_score_data | safe }};
+    initScoreChart('scoreChart', scoreData);
+  </script>
+</body>
+</html>

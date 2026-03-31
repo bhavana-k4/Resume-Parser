@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resume Parser — AI Match Analyzer</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <div class="logo">
+        <span class="logo-icon">&#9670;</span>
+        <span class="logo-text">ResumeAI</span>
+      </div>
+      <p class="tagline">Analyze your resume against any job description in seconds</p>
+    </header>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form action="/analyze" method="POST" enctype="multipart/form-data" class="main-form">
+      <div class="form-grid">
+
+        <!-- Resume Upload -->
+        <div class="form-panel">
+          <h2 class="panel-title">
+            <span class="step-badge">1</span> Upload Your Resume
+          </h2>
+          <div class="upload-zone" id="uploadZone">
+            <input type="file" name="resume_file" id="resumeFile"
+                   accept=".pdf,.docx,.txt" class="file-input"
+                   onchange="showFileName(this)" required>
+            <label for="resumeFile" class="upload-label">
+              <div class="upload-icon">
+                <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                  <rect width="40" height="40" rx="10" fill="#eeeeff"/>
+                  <path d="M20 26V14M14 20l6-6 6 6" stroke="#6c63ff" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M13 30h14" stroke="#6c63ff" stroke-width="2"
+                        stroke-linecap="round"/>
+                </svg>
+              </div>
+              <div class="upload-primary" id="uploadText">Click to upload or drag &amp; drop</div>
+              <div class="upload-secondary">PDF, DOCX, or TXT &nbsp;·&nbsp; Max 5 MB</div>
+            </label>
+          </div>
+          <div id="fileChosen" class="file-chosen-bar" style="display:none;">
+            <span class="file-chosen-icon">&#128196;</span>
+            <span id="fileChosenName"></span>
+            <button type="button" class="file-clear-btn" onclick="clearFile()">&#10005;</button>
+          </div>
+        </div>
+
+        <!-- Job Description -->
+        <div class="form-panel">
+          <h2 class="panel-title">
+            <span class="step-badge">2</span> Paste Job Description
+          </h2>
+          <textarea name="jd_text" id="jdText"
+                    class="text-area" rows="13"
+                    placeholder="Paste the full job description here — include requirements, responsibilities, and preferred qualifications for best results."
+                    required></textarea>
+          <p class="tip">Include the complete JD for the most accurate match score.</p>
+        </div>
+
+      </div>
+
+      <div class="submit-row">
+        <button type="submit" class="btn-analyze" id="submitBtn">
+          <span class="btn-text">Analyze Match</span>
+          <span class="btn-arrow">&#8594;</span>
+        </button>
+        <p class="submit-note">Powered by spaCy &nbsp;·&nbsp; scikit-learn &nbsp;·&nbsp; Gemini AI</p>
+      </div>
+    </form>
+
+    <div class="features-strip">
+      <div class="feature"><div class="feature-dot green"></div><div class="feature-label">Match Score</div></div>
+      <div class="feature"><div class="feature-dot red"></div><div class="feature-label">Skill Gap Analysis</div></div>
+      <div class="feature"><div class="feature-dot amber"></div><div class="feature-label">ATS Compatibility</div></div>
+      <div class="feature"><div class="feature-dot purple"></div><div class="feature-label">AI Suggestions</div></div>
+    </div>
+
+  </div>
+
+  <script>
+    function showFileName(input) {
+      if (input.files && input.files[0]) {
+        document.getElementById('uploadZone').style.display = 'none';
+        const bar = document.getElementById('fileChosen');
+        bar.style.display = 'flex';
+        document.getElementById('fileChosenName').textContent = input.files[0].name;
+      }
+    }
+    function clearFile() {
+      document.getElementById('resumeFile').value = '';
+      document.getElementById('uploadZone').style.display = 'block';
+      document.getElementById('fileChosen').style.display = 'none';
+    }
+    document.querySelector('.main-form').addEventListener('submit', function(e) {
+      if (!document.getElementById('resumeFile').files.length) {
+        e.preventDefault();
+        alert('Please upload a resume file first.');
+        return;
+      }
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.querySelector('.btn-text').textContent = 'Analyzing\u2026';
+    });
+    const zone = document.getElementById('uploadZone');
+    zone.addEventListener('dragover',  e => { e.preventDefault(); zone.classList.add('drag-over'); });
+    zone.addEventListener('dragleave', ()  => zone.classList.remove('drag-over'));
+    zone.addEventListener('drop', e => {
+      e.preventDefault();
+      zone.classList.remove('drag-over');
+      const file = e.dataTransfer.files[0];
+      if (file) {
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        document.getElementById('resumeFile').files = dt.files;
+        showFileName(document.getElementById('resumeFile'));
+      }
+    });
+  </script>
+</body>
+</html>
